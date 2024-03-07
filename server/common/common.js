@@ -14,26 +14,16 @@ const hashCompare = async (password, hash) => {
 };
 
 const createToken = async (payload, res) => {
-  // if (!payload || typeof payload !== 'string') {
-  //   throw new Error('userId must be provided and must be a string');
-  // }
+
   const token = jwt.sign({ payload }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 
   res.cookie('jwt', token, {
     httpOnly: true,
-    secure: false,
-    path: "/",
+    secure: true,
     sameSite: 'None'
   });
-
-  // res.cookie('jwt', token, {
-  //   maxAge: 15 * 24 * 60 * 60 * 1000,
-  //   httpOnly: true,
-  //   sameSite: 'strict',
-  //   secure: process.env.NODE_ENV !== 'development',
-  // });
 
   return token;
 };
