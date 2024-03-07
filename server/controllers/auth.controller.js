@@ -55,17 +55,17 @@ const login = async (req, res) => {
             return res.status(400).json({ error: "Invalid username or password" })
         }
 
-        let token =await  common.createToken(user._id, res);
+        let token = await common.createToken(user._id, res);
         console.log("token", token);
         res.cookie('jwt', token, {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: 'None'
         });
         res.cookie('token', token, {
-            httpOnly: true,
-            secure: false,
-            path: "/login",
+            httpOnly: false,
+            secure: true,
+            path: "/",
             sameSite: 'None'
         });
         res.status(200).json({
