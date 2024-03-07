@@ -26,7 +26,7 @@ export const SocketContextProvider = ({ children }) => {
         // Check if there is an authenticated user
         if (authUser) {
             // Connect to the socket server
-            const socket = io(`${import.meta.env.VITE_URL}`, {
+            const socket = io(`https://chat-app-gpx4.onrender.com`, {
                 query: {
                     userId: authUser._id, // Pass user ID as query parameter
                 },

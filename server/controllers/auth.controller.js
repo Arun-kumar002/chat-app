@@ -1,17 +1,17 @@
 import User from "../models/user.model.js";
 import common from "../common/common.js";
 
-const signup = async (req, res)=>{
+const signup = async (req, res) => {
     try {
-        const {fullName, username, password, confirmPassword, gender } = req.body;
+        const { fullName, username, password, confirmPassword, gender } = req.body;
 
-        if(password !== confirmPassword) {
-            return res.status(400).json({error: "Password don't match"})
+        if (password !== confirmPassword) {
+            return res.status(400).json({ error: "Password don't match" })
         }
 
-        const user = await User.findOne({username})
-        if(user){
-            return res.status(400).json({error: "Username already exists"})
+        const user = await User.findOne({ username })
+        if (user) {
+            return res.status(400).json({ error: "Username already exists" })
         }
 
         const hashedPassword = await common.hashPassword(password)
@@ -27,7 +27,7 @@ const signup = async (req, res)=>{
             profilePic: gender === "male" ? boyprofilePic : girlprofilePic,
         })
 
-        if (newUser){
+        if (newUser) {
             common.createToken(newUser._id, res)
             await newUser.save()
             res.status(201).json({
@@ -36,46 +36,59 @@ const signup = async (req, res)=>{
                 username: newUser.username,
                 profilePic: newUser.profilePic
             })
-        }else{
-            res.status(400).json({error:'Invalid user data'})
+        } else {
+            res.status(400).json({ error: 'Invalid user data' })
         }
     } catch (error) {
         console.log("Error in signup controller", error.message)
-        res.status(500).json({error: 'Internal server Error'})
+        res.status(500).json({ error: 'Internal server Error' })
     }
 }
 
-const login = async (req, res)=>{
+const login = async (req, res) => {
     try {
-        const {username, password} = req.body
-        const user = await User.findOne({username})
+        const { username, password } = req.body
+        const user = await User.findOne({ username })
         const isPasswordCorrect = await common.hashCompare(password, user?.password || '')
 
-        if(!user || !isPasswordCorrect){
-            return res.status(400).json({error: "Invalid username or password"})
+        if (!user || !isPasswordCorrect) {
+            return res.status(400).json({ error: "Invalid username or password" })
         }
 
-        common.createToken(user._id,res);
+        let token = common.createToken(user._id, res);
+        console.log("token", token);
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'None'
+        });
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            path: "/login",
+            sameSite: 'None'
+        });
         res.status(200).json({
             _id: user._id,
             fullName: user.fullName,
             username: user.username,
-            profilePic: user.profilePic
+            profilePic: user.profilePic,
+            token
         })
-        
+
     } catch (error) {
         console.log("Error in login controller", error.message)
-        res.status(500).json({error: 'Internal server Error'})
+        res.status(500).json({ error: 'Internal server Error' })
     }
 }
 
-const logout =(req, res)=>{
+const logout = (req, res) => {
     try {
-        res.cookie("jwt","",{maxAge: 0});
-        res.status(200).json({message: "Logged out successfully"})
+        res.cookie("jwt", "", { maxAge: 0 });
+        res.status(200).json({ message: "Logged out successfully" })
     } catch (error) {
         console.log("Error in login controller", error.message)
-        res.status(500).json({error: 'Internal server Error'})
+        res.status(500).json({ error: 'Internal server Error' })
     }
 }
 

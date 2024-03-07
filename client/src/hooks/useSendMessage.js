@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useConversation from "../zustand/useConversation";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 const useSendMessage = () => {
 	const [loading, setLoading] = useState(false);
@@ -9,19 +10,17 @@ const useSendMessage = () => {
 	const sendMessage = async (message) => {
 		setLoading(true);
 		try {
-			const res = await fetch(
-        `${import.meta.env.VITE_URL}/api/message/send/${
-          selectedConversation._id
-        }`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ message }),
-        }
-      );
-			const data = await res.json();
+			const res = await axios.post(
+				`https://chat-app-gpx4.onrender.com/api/message/send/${selectedConversation._id
+				}`, { message },
+				{
+					headers: {
+						"Content-Type": "application/json",
+					},
+					withCredentials: true
+				}
+			);
+			const data = res.data;
 			if (data.error) throw new Error(data.error);
 
 			setMessages([...messages, data]);

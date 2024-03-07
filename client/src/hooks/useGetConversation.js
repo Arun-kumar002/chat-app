@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -9,8 +10,8 @@ const useGetConversations = () => {
 		const getConversations = async () => {
 			setLoading(true);
 			try {
-				const res = await fetch(`${import.meta.env.VITE_URL}/api/user`);
-				const data = await res.json();
+				const res = await axios.get(`https://chat-app-gpx4.onrender.com/api/user`, { withCredentials: true });
+				const data = res.data;
 				if (data.error) {
 					throw new Error(data.error);
 				}
