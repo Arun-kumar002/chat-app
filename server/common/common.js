@@ -27,7 +27,7 @@ const createToken = async (payload, res) => {
     path: "/",
     sameSite: 'None'
   });
-  
+
   // res.cookie('jwt', token, {
   //   maxAge: 15 * 24 * 60 * 60 * 1000,
   //   httpOnly: true,
